@@ -1,0 +1,111 @@
+from bs4 import BeautifulSoup
+import random
+from tkinter import *
+import base64
+import requests
+import base64
+import json
+import spotipy
+import sys
+from spotipy.oauth2 import SpotifyClientCredentials
+
+playlist_id = "6iGHel3ABNWuHU6253hyXq" #retrieving spotify playlist
+    
+spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id="e127cc9c2d334beeb4de981ce039c16e", client_secret="d4b15e9693c84333ae6a8d172fc04753"))
+
+
+#creates a list of artist name+song to use in analyser 
+def get_playlist_info(playlist_id):
+    global playlist
+    results = spotify.playlist_items(playlist_id, fields=None, limit=100, offset=0, market=None, additional_types=('track', 'episode'))
+    items = results["items"]
+    
+    playlist = []
+    
+    for i in items:
+        dict = {}
+
+        name = i["track"]["name"]
+        dict["song"] = name.lower().replace(" ", "-")
+
+        artists = i["track"]["artists"]
+        dict["artist"] = []
+        for i in artists:
+            artist = i["name"].lower().replace(" ", "-")
+            dict["artist"].append(artist)
+
+        playlist.append(dict)
+    
+get_playlist_info(playlist_id)
+
+# __________________________
+
+#getting the bpm 
+
+def analyse():
+    global playlist, songlist
+    songlist = []
+    for i in playlist:
+        artist = i["artist"][0]
+        song = i["song"]
+
+        source = requests.get(f"https://songbpm.com/@{artist}/{song}").text
+        soup = BeautifulSoup(source, "lxml")
+
+        try:
+            name = soup.find("h1", class_="text-4xl font-bold").text
+            songlist.append(name)
+
+            key = soup.find("dd", class_="mt-1 text-3xl font-semibold text-gray-900").text
+            
+            bpm = soup.find("dd", class_="mt-1 flex flex-row items-center justify-center gap-x-2 text-3xl font-semibold text-gray-900").text.strip("BPM")
+            
+            if key == keys:
+                if int(bpm) <= bpm_range[0] and int(bpm) >= bpm_range[1]:
+                    songlist.append(name)
+            
+        except AttributeError:
+            continue
+        
+    return songlist
+
+
+root  = Tk()
+root.geometry("500x500")
+myLabel_1 = Label(root,text="Welcome!!, enter your favourite beats and keys,We will generate the song it fits").pack()
+
+Beats = StringVar()
+Keys = StringVar()
+
+#_____________________
+def generate(): #tkinter portion 
+    global Beats, Keys, beats, keys, bpm_range
+    
+    beats = Beats.get()
+    bpm_range = [int(beats)+10, int(beats)-10]
+    keys = Keys.get()
+    generating = Label(root,text = "We are generating the song it fits").pack
+    Beats.set("")
+    Keys.set("")
+    
+    get_playlist_info(playlist_id)
+    analyse()
+    output()
+#     result = analyse()
+#     print(result)
+    
+label_beats = Label(root,text="Beats").pack()
+entry_beats = Entry(root,textvariable = Beats).pack()
+label_keys = Label(root,text="Keys").pack()
+entry_keys = Entry(root,textvariable = Keys).pack()
+
+
+
+
+generate_buttom = Button(root,text="Starting to Generate",command = generate).pack()
+
+def output():#outputvariable needed
+    for songs in songlist:
+        songname = Label(root,text = songs).pack()
+
+root.mainloop()
