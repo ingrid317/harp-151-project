@@ -19,7 +19,7 @@ def analyse_return(playlist_id):
     global songlist
     songlist = []
     
-    track_uris = [x["track"]["uri"] for x in spotify.playlist_tracks(playlist_URI)["items"]]
+    track_uris = [x["track"]["uri"] for x in spotify.playlist_tracks(playlist_id)["items"]]
     
     for i in spotify.playlist_tracks(playlist_id)["items"]:
         track_uri = i["track"]["uri"]
@@ -41,6 +41,7 @@ myLabel_1 = Label(root,text="Welcome!!, enter your favourite beats and keys,We w
 
 Beats = StringVar()
 Keys = StringVar()
+URL = StringVar()
 
 #_____________________
 def generate(): #tkinter portion 
@@ -57,16 +58,33 @@ def generate(): #tkinter portion
     output()
 #     result = analyse()
 #     print(result)
+
+def similar_songs(): #tkinter portion 
+    global beats, keys, bpm_range, URL
+    
+    url = URL.get()
+
+    features = spotify.audio_features(url)[0]
+    
+    beats = features["tempo"]
+    bpm_range = [int(beats)+10, int(beats)-10]
+    keys = features["key"]
+    generating = Label(root,text = "We are generating the song it fits").pack
+    
+    analyse_return(playlist_id)
+    output()
     
 label_beats = Label(root,text="Beats").pack()
 entry_beats = Entry(root,textvariable = Beats).pack()
 label_keys = Label(root,text="Keys").pack()
 entry_keys = Entry(root,textvariable = Keys).pack()
 
-
-
-
 generate_buttom = Button(root,text="Starting to Generate",command = generate).pack()
+
+label_song = Label(root, text = "Enter the Spotify URL of a song you like, and we'll generate similar songs")
+entry_song = Entry(root, textvariable = URL).pack()
+
+generate_buttom = Button(root,text="Click to Generate Similar Songs",command = similar_songs).pack()
 
 def output():#outputvariable needed
     for songs in songlist:
