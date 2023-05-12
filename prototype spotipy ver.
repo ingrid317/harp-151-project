@@ -35,6 +35,7 @@ def analyse_return(playlist_id):
                 songlist.append(name)
 
 def OpenKeychanges(letter):
+    global keys
     OpenKeyDic={
         1:["C","a"],
         2:["G","e"],
@@ -52,7 +53,7 @@ def OpenKeychanges(letter):
     for i in OpenKeyDic:
         for a in (0,1):
             if OpenKeyDic[i][a] == letter:
-                return i
+                keys = i
 
 root  = Tk()
 root.geometry("500x500")
@@ -69,7 +70,7 @@ def generate(): #tkinter portion
     beats = Beats.get()
     bpm_range = [int(beats)+10, int(beats)-10]
     letter = Keys.get()
-    keys = OpenKeychanges(letter)
+    OpenKeychanges(letter)
     generating = Label(root,text = "We are generating the song it fits").pack
     Beats.set("")
     Keys.set("")
@@ -94,14 +95,16 @@ def similar_songs(): #tkinter portion
     analyse_return(playlist_id)
     output()
     
-label_beats = Label(root,text="Beats").pack()
+label_beats = Label(root,text="Enter your desired beats per minute (BPM)").pack()
 entry_beats = Entry(root,textvariable = Beats).pack()
-label_keys = Label(root,text="Keys").pack()
+label_keys = Label(root,text="Enter your desired music key").pack()
+label_keys1 = Label(root, text = "Use capital letters for major key and lowercase letters for minor key; use 1 in place of ♭ and h for #").pack()
+label_keys2 = Label(root, text = "ex. E♭ = Eb, c# = ch").pack()
 entry_keys = Entry(root,textvariable = Keys).pack()
 
-generate_buttom = Button(root,text="Starting to Generate",command = generate).pack()
+generate_buttom = Button(root,text="Click to generate songs that match your conditions",command = generate).pack()
 
-label_song = Label(root, text = "Enter the Spotify URL of a song you like, and we'll generate similar songs")
+label_song = Label(root, text = "Or enter the Spotify URL of a song you like, and we'll generate similar songs").pack()
 entry_song = Entry(root, textvariable = URL).pack()
 
 generate_buttom = Button(root,text="Click to Generate Similar Songs",command = similar_songs).pack()
