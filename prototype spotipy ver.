@@ -8,6 +8,7 @@ import json
 import spotipy
 import sys
 from spotipy.oauth2 import SpotifyClientCredentials
+import webbrowser
 
 playlist_id = "6iGHel3ABNWuHU6253hyXq" #retrieving spotify playlist
     
@@ -32,7 +33,7 @@ def analyse_return(playlist_id):
 
         if key <= int(keys)+3 and key >= int(keys)-3:
             if int(bpm) <= bpm_range[0] and int(bpm) >= bpm_range[1]:
-                songlist.append(name)
+                songlist.append(track_uri)
 
 def OpenKeychanges(letter):
     global keys
@@ -99,7 +100,7 @@ label_beats = Label(root,text="Enter your desired beats per minute (BPM)").pack(
 entry_beats = Entry(root,textvariable = Beats).pack()
 label_keys = Label(root,text="Enter your desired music key").pack()
 label_keys1 = Label(root, text = "Use capital letters for major key and lowercase letters for minor key; use 1 in place of ♭ and h for #").pack()
-label_keys2 = Label(root, text = "ex. E♭ = Eb, c# = ch").pack()
+label_keys2 = Label(root, text = "ex. E♭ = E1, c# = ch").pack()
 entry_keys = Entry(root,textvariable = Keys).pack()
 
 generate_button = Button(root,text="Click to generate songs that match your conditions",command = generate).pack()
@@ -109,13 +110,13 @@ entry_song = Entry(root, textvariable = URL).pack()
 
 generate_button = Button(root,text="Click to Generate Similar Songs",command = similar_songs).pack()
 
-selected_option = tk.StringVar(root)
+selected_option = StringVar(root)
 
 selected_option.set("Click to change genre")
 
 options = ["EDM", "Hip Hop", "Indie", "Jazz"]
 
-dropdown = tk.OptionMenu(root, selected_option, *options)
+dropdown = OptionMenu(root, selected_option, *options)
 dropdown.pack()
 
 def on_select(option):
@@ -133,6 +134,12 @@ selected_option.trace("w", lambda name, index, mode, on_select=on_select: on_sel
 
 def output():#outputvariable needed
     for songs in songlist:
-        songname = Label(root,text = songs).pack()
+        name = spotify.track(songs)["name"]
+        link = spotify.track(songs)["external_urls"]["spotify"]
+        songname = Label(root,text = name).pack()
+        songlink = Label(root, text=link, fg="blue", cursor="hand2")
+        songlink.pack()
+        songlink.bind("<Button-1>", lambda e:
+        callback(link))
 
 root.mainloop()
