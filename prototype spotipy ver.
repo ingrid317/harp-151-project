@@ -34,6 +34,25 @@ def analyse_return(playlist_id):
             if int(bpm) <= bpm_range[0] and int(bpm) >= bpm_range[1]:
                 songlist.append(name)
 
+def OpenKeychanges(letter):
+    OpenKeyDic={
+        1:["C","a"],
+        2:["G","e"],
+        3:["D","b"],
+        4:["A","fh"],
+        5:["E","ch"],
+        6:["B","gh"],
+        7:["Fh","el"],
+        8:["Dl","bl"],
+        9:["Al","f"],
+        10:["El","c"],
+        11:["Bl","g"],
+        12:["F","d"],
+    }
+    for i in OpenKeyDic:
+        for a in (0,1):
+            if OpenKeyDic[i][a] == letter:
+                return i
 
 root  = Tk()
 root.geometry("500x500")
@@ -49,7 +68,8 @@ def generate(): #tkinter portion
     
     beats = Beats.get()
     bpm_range = [int(beats)+10, int(beats)-10]
-    keys = Keys.get()
+    letter = Keys.get()
+    keys = OpenKeychanges(letter)
     generating = Label(root,text = "We are generating the song it fits").pack
     Beats.set("")
     Keys.set("")
