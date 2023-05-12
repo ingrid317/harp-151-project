@@ -102,12 +102,34 @@ label_keys1 = Label(root, text = "Use capital letters for major key and lowercas
 label_keys2 = Label(root, text = "ex. E♭ = Eb, c# = ch").pack()
 entry_keys = Entry(root,textvariable = Keys).pack()
 
-generate_buttom = Button(root,text="Click to generate songs that match your conditions",command = generate).pack()
+generate_button = Button(root,text="Click to generate songs that match your conditions",command = generate).pack()
 
 label_song = Label(root, text = "Or enter the Spotify URL of a song you like, and we'll generate similar songs").pack()
 entry_song = Entry(root, textvariable = URL).pack()
 
-generate_buttom = Button(root,text="Click to Generate Similar Songs",command = similar_songs).pack()
+generate_button = Button(root,text="Click to Generate Similar Songs",command = similar_songs).pack()
+
+selected_option = tk.StringVar(root)
+
+selected_option.set("Click to change genre")
+
+options = ["EDM", "Hip Hop", "Indie", "Jazz"]
+
+dropdown = tk.OptionMenu(root, selected_option, *options)
+dropdown.pack()
+
+def on_select(option):
+    global playlist_id
+    if option == "EDM":
+        playlist_id = "37i9dQZF1DXa41CMuUARjl"
+    elif option == "Hip Hop":
+        playlist_id = "37i9dQZF1DX5qmTk3PVatJ"
+    elif option == "Indie":
+        playlist_id = "37i9dQZF1EQqkOPvHGajmW"
+    elif option == "Jazz":
+        playlist_id = "37i9dQZF1EQqA6klNdJvwx"
+    
+selected_option.trace("w", lambda name, index, mode, on_select=on_select: on_select(selected_option.get()))
 
 def output():#outputvariable needed
     for songs in songlist:
